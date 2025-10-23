@@ -1,0 +1,7 @@
+.DS_Store
+
+# Demo downloads
+demo/*.zip
+demo/*.tar.gz
+demo/downloads/
+epo-bdds-demo

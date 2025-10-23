@@ -1,0 +1,325 @@
+openapi: 3.0.3
+info:
+  title: EPO Bulk Data Distribution Service (BDDS) API (unofficial)
+  description: |
+    European Patent Office Bulk Data Distribution Service API for accessing patent data sets.
+
+    **Authentication**: OAuth2 password grant flow required.
+    **Base URL**: https://publication-bdds.apps.epo.org/bdds/bdds-bff-service/prod/api
+
+    This specification was reverse-engineered from the actual API behavior.
+  version: 1.0.0
+  contact:
+    name: Wolfgang Stark
+    url: https://patent.dev
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://publication-bdds.apps.epo.org/bdds/bdds-bff-service/prod/api
+    description: Production server
+  - url: https://login.epo.org
+    description: OAuth server
+
+paths:
+  /oauth2/aus3up3nz0N133c0V417/v1/token:
+    post:
+      summary: Authenticate to EPO BDDS
+      description: Obtain an OAuth2 access token using password grant flow
+      operationId: authenticate
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required:
+                - grant_type
+                - username
+                - password
+                - scope
+              properties:
+                grant_type:
+                  type: string
+                  enum: [password]
+                  description: OAuth2 grant type
+                username:
+                  type: string
+                  description: EPO BDDS username
+                password:
+                  type: string
+                  format: password
+                  description: EPO BDDS password
+                scope:
+                  type: string
+                  enum: [openid]
+                  description: OAuth2 scope
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          schema:
+            type: string
+          description: 'Basic MG9hM3VwZG43YW41cE1JOE80MTc='
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenResponse'
+        '400':
+          description: Bad request
+        '401':
+          description: Authentication failed
+
+  /products/:
+    get:
+      summary: List all products
+      description: Retrieve list of all available BDDS products (both subscribed and public)
+      operationId: listProducts
+      tags:
+        - Products
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '401':
+          description: Unauthorized - invalid or expired token
+
+  /products/{productId}:
+    get:
+      summary: Get product details with deliveries
+      description: Retrieve detailed information about a specific product including all available deliveries
+      operationId: getProduct
+      tags:
+        - Products
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Product ID
+      responses:
+        '200':
+          description: Product details with deliveries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductWithDeliveries'
+        '401':
+          description: Unauthorized - invalid or expired token
+        '404':
+          description: Product not found
+
+  /products/{productId}/delivery/{deliveryId}/file/{fileId}/download:
+    get:
+      summary: Download delivery file
+      description: Download a specific file from a product delivery
+      operationId: downloadFile
+      tags:
+        - Downloads
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Product ID
+        - name: deliveryId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Delivery ID
+        - name: fileId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: File ID
+      responses:
+        '200':
+          description: File content
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '401':
+          description: Unauthorized - invalid or expired token
+        '404':
+          description: File not found
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: OAuth2 Bearer token obtained from /oauth2/.../token endpoint
+
+  schemas:
+    TokenResponse:
+      type: object
+      required:
+        - token_type
+        - expires_in
+        - access_token
+        - scope
+        - id_token
+      properties:
+        token_type:
+          type: string
+          example: Bearer
+          description: Token type
+        expires_in:
+          type: integer
+          example: 3600
+          description: Token expiry time in seconds (typically 1 hour)
+        access_token:
+          type: string
+          description: JWT access token
+        scope:
+          type: string
+          example: openid
+          description: OAuth2 scope
+        id_token:
+          type: string
+          description: OpenID Connect ID token
+
+    Product:
+      type: object
+      required:
+        - id
+        - name
+        - description
+      properties:
+        id:
+          type: integer
+          example: 3
+          description: Product ID
+        name:
+          type: string
+          example: EP DocDB front file
+          description: Product name
+        description:
+          type: string
+          example: EP DocDB front file - bibliographic data
+          description: Product description
+
+    ProductWithDeliveries:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - deliveries
+      properties:
+        id:
+          type: integer
+          example: 3
+          description: Product ID
+        name:
+          type: string
+          example: EP DocDB front file
+          description: Product name
+        description:
+          type: string
+          example: EP DocDB front file - bibliographic data
+          description: Product description
+        deliveries:
+          type: array
+          items:
+            $ref: '#/components/schemas/Delivery'
+          description: List of available deliveries for this product
+
+    Delivery:
+      type: object
+      required:
+        - deliveryId
+        - deliveryName
+        - deliveryPublicationDatetime
+        - files
+      properties:
+        deliveryId:
+          type: integer
+          example: 12345
+          description: Delivery ID
+        deliveryName:
+          type: string
+          example: "2024-10-15"
+          description: Delivery name (typically a date)
+        deliveryPublicationDatetime:
+          type: string
+          format: date-time
+          example: "2024-10-15T10:30:00Z"
+          description: When the delivery was published
+        deliveryExpiryDatetime:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2024-11-15T10:30:00Z"
+          description: When the delivery expires (null if no expiry)
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeliveryFile'
+          description: Files in this delivery
+
+    DeliveryFile:
+      type: object
+      required:
+        - fileId
+        - fileName
+        - fileSize
+        - fileChecksum
+        - filePublicationDatetime
+      properties:
+        fileId:
+          type: integer
+          example: 67890
+          description: File ID
+        fileName:
+          type: string
+          example: "EP_docdb_20241015.zip"
+          description: File name
+        fileSize:
+          type: string
+          example: "1.5 GB"
+          description: Human-readable file size
+        fileChecksum:
+          type: string
+          example: "a1b2c3d4e5f6..."
+          description: File checksum (typically MD5 or SHA)
+        filePublicationDatetime:
+          type: string
+          format: date-time
+          example: "2024-10-15T10:30:00Z"
+          description: When the file was published
+
+security:
+  - BearerAuth: []
+
+tags:
+  - name: Authentication
+    description: OAuth2 authentication endpoints
+  - name: Products
+    description: Product listing and details
+  - name: Downloads
+    description: File download endpoints
