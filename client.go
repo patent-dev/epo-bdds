@@ -1,20 +1,26 @@
+// Package bdds provides a Go client for the European Patent Office's Bulk Data
+// Distribution Service (BDDS), covering product discovery, delivery listing, and
+// downloading of bulk patent datasets such as DOCDB, INPADOC, and EP full-text.
 package bdds
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/patent-dev/epo-bdds/generated"
 )
 
 const (
-	// OAuth2 token TTL from EPO BDDS documentation
-	tokenTTL = time.Hour
+	// Default OAuth2 token TTL, used when the token response omits expires_in.
+	defaultTokenTTL = time.Hour
 	// Refresh token 5 minutes before expiry for safety
 	tokenRefreshBuffer = 5 * time.Minute
 )
@@ -23,20 +29,22 @@ const (
 type Client struct {
 	config          *Config
 	httpClient      *http.Client
-	token           string
-	tokenExpiry     time.Time
 	generatedClient *generated.ClientWithResponses
+
+	tokenMu     sync.Mutex
+	token       string
+	tokenExpiry time.Time
 }
 
 // Config holds client configuration
 type Config struct {
-	Username   string // EPO BDDS username
-	Password   string // EPO BDDS password
-	BaseURL    string // Base URL for API (default: https://publication-bdds.apps.epo.org)
-	UserAgent  string // Optional custom user agent
-	MaxRetries int    // Maximum number of retries (default: 3)
-	RetryDelay int    // Seconds between retries (default: 1)
-	Timeout    int    // Request timeout in seconds (default: 30)
+	Username   string        // EPO BDDS username
+	Password   string        // EPO BDDS password
+	BaseURL    string        // Base URL for API (default: https://publication-bdds.apps.epo.org)
+	UserAgent  string        // Optional custom user agent
+	MaxRetries int           // Maximum number of retries (default: 3)
+	RetryDelay time.Duration // Delay between retries (default: 1s)
+	Timeout    time.Duration // Request timeout (default: 30s)
 }
 
 // DefaultConfig returns default configuration
@@ -45,8 +53,8 @@ func DefaultConfig() *Config {
 		BaseURL:    "https://publication-bdds.apps.epo.org",
 		UserAgent:  "PatentDev/BDDS/1.0",
 		MaxRetries: 3,
-		RetryDelay: 1,
-		Timeout:    30,
+		RetryDelay: time.Second,
+		Timeout:    30 * time.Second,
 	}
 }
 
@@ -54,29 +62,33 @@ func DefaultConfig() *Config {
 // Authentication is optional - free products work without credentials,
 // paid products require EPO BDDS subscription and authentication.
 func NewClient(config *Config) (*Client, error) {
-	if config == nil {
-		config = DefaultConfig()
+	// Copy the caller's config so applying defaults never mutates their struct.
+	cfg := DefaultConfig()
+	if config != nil {
+		*cfg = *config
 	}
 
-	// Apply defaults
-	if config.BaseURL == "" {
-		config.BaseURL = DefaultConfig().BaseURL
+	// Apply defaults for any unset fields.
+	defaults := DefaultConfig()
+	if cfg.BaseURL == "" {
+		cfg.BaseURL = defaults.BaseURL
 	}
-	if config.UserAgent == "" {
-		config.UserAgent = DefaultConfig().UserAgent
+	if cfg.UserAgent == "" {
+		cfg.UserAgent = defaults.UserAgent
 	}
-	if config.MaxRetries == 0 {
-		config.MaxRetries = DefaultConfig().MaxRetries
+	if cfg.MaxRetries == 0 {
+		cfg.MaxRetries = defaults.MaxRetries
 	}
-	if config.RetryDelay == 0 {
-		config.RetryDelay = DefaultConfig().RetryDelay
+	if cfg.RetryDelay == 0 {
+		cfg.RetryDelay = defaults.RetryDelay
 	}
-	if config.Timeout == 0 {
-		config.Timeout = DefaultConfig().Timeout
+	if cfg.Timeout == 0 {
+		cfg.Timeout = defaults.Timeout
 	}
+	config = cfg
 
 	httpClient := &http.Client{
-		Timeout: time.Duration(config.Timeout) * time.Second,
+		Timeout: config.Timeout,
 	}
 
 	client := &Client{
@@ -103,34 +115,52 @@ func (c *Client) authRequestEditor(ctx context.Context, req *http.Request) error
 	// Skip authentication if no credentials provided
 	if c.config.Username != "" && c.config.Password != "" {
 		// Ensure we have a valid token
-		if err := c.ensureValidToken(ctx); err != nil {
+		token, err := c.ensureValidToken(ctx)
+		if err != nil {
 			return fmt.Errorf("authentication failed: %w", err)
 		}
-		req.Header.Set("Authorization", "Bearer "+c.token)
+		req.Header.Set("Authorization", "Bearer "+token)
 	}
 
 	req.Header.Set("User-Agent", c.config.UserAgent)
 	return nil
 }
 
-// ensureValidToken checks if token is expired and refreshes if needed
-func (c *Client) ensureValidToken(ctx context.Context) error {
+// ensureValidToken returns a valid token, refreshing it if expired. All access
+// to the cached token state is guarded by tokenMu so it is safe to call from
+// concurrent requests.
+func (c *Client) ensureValidToken(ctx context.Context) (string, error) {
 	// Skip if no credentials configured
 	if c.config.Username == "" || c.config.Password == "" {
-		return nil
+		return "", nil
 	}
+
+	c.tokenMu.Lock()
+	defer c.tokenMu.Unlock()
 
 	// Check if token exists and is still valid
 	if c.token != "" && time.Now().Add(tokenRefreshBuffer).Before(c.tokenExpiry) {
-		return nil
+		return c.token, nil
 	}
 
 	// Need to authenticate or refresh
-	return c.authenticate(ctx)
+	if err := c.authenticateLocked(ctx); err != nil {
+		return "", err
+	}
+	return c.token, nil
 }
 
-// authenticate performs OAuth2 password grant authentication
-func (c *Client) authenticate(ctx context.Context) error {
+// clearToken invalidates the cached token so the next request re-authenticates.
+func (c *Client) clearToken() {
+	c.tokenMu.Lock()
+	defer c.tokenMu.Unlock()
+	c.token = ""
+	c.tokenExpiry = time.Time{}
+}
+
+// authenticateLocked performs OAuth2 password grant authentication. The caller
+// must hold tokenMu.
+func (c *Client) authenticateLocked(ctx context.Context) error {
 	const (
 		oauthURL = "https://login.epo.org/oauth2/aus3up3nz0N133c0V417/v1/token"
 		clientID = "MG9hM3VwZG43YW41cE1JOE80MTc="
@@ -155,7 +185,7 @@ func (c *Client) authenticate(ctx context.Context) error {
 	if err != nil {
 		return fmt.Errorf("auth request failed: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -170,13 +200,21 @@ func (c *Client) authenticate(ctx context.Context) error {
 		return fmt.Errorf("failed to parse token response: %w", err)
 	}
 
+	ttl := defaultTokenTTL
+	if tokenResp.ExpiresIn > 0 {
+		ttl = time.Duration(tokenResp.ExpiresIn) * time.Second
+	}
+
 	c.token = tokenResp.AccessToken
-	c.tokenExpiry = time.Now().Add(tokenTTL)
+	c.tokenExpiry = time.Now().Add(ttl)
 
 	return nil
 }
 
-// retryableRequest wraps requests with retry logic
+// retryableRequest wraps requests with retry logic. It only retries transient
+// failures (network errors, 5xx, 429) and 401s (after clearing the token to
+// force re-authentication). Other 4xx responses are returned immediately. The
+// backoff wait honours context cancellation.
 func (c *Client) retryableRequest(ctx context.Context, fn func() error) error {
 	var lastErr error
 	for attempt := 0; attempt <= c.config.MaxRetries; attempt++ {
@@ -186,18 +224,87 @@ func (c *Client) retryableRequest(ctx context.Context, fn func() error) error {
 		}
 		lastErr = err
 
-		// Check if it's a 401 - try re-authenticating
-		if authErr, ok := err.(*AuthError); ok && authErr.StatusCode == 401 && attempt < c.config.MaxRetries {
-			// Force re-auth by clearing token
-			c.token = ""
-			c.tokenExpiry = time.Time{}
+		retry, after := c.classifyRetry(err)
+		if !retry || attempt == c.config.MaxRetries {
+			break
 		}
 
-		if attempt < c.config.MaxRetries {
-			time.Sleep(time.Duration(c.config.RetryDelay*(attempt+1)) * time.Second)
+		// On 401, force re-auth by clearing the cached token.
+		var authErr *AuthError
+		if errors.As(err, &authErr) && authErr.StatusCode == http.StatusUnauthorized {
+			c.clearToken()
+		}
+
+		wait := time.Duration(attempt+1) * c.config.RetryDelay
+		if after > wait {
+			wait = after
+		}
+
+		timer := time.NewTimer(wait)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return ctx.Err()
+		case <-timer.C:
 		}
 	}
 	return fmt.Errorf("failed after %d retries: %w", c.config.MaxRetries, lastErr)
+}
+
+// classifyRetry reports whether err is transient and should be retried, plus an
+// optional minimum wait (e.g. a Retry-After hint from a rate-limit response).
+func (c *Client) classifyRetry(err error) (retry bool, after time.Duration) {
+	var authErr *AuthError
+	if errors.As(err, &authErr) {
+		return authErr.StatusCode == http.StatusUnauthorized, 0
+	}
+
+	var rateErr *RateLimitError
+	if errors.As(err, &rateErr) {
+		return true, time.Duration(rateErr.RetryAfter) * time.Second
+	}
+
+	var statusErr *statusError
+	if errors.As(err, &statusErr) {
+		// Retry server errors; never retry other 4xx.
+		return statusErr.StatusCode >= 500, 0
+	}
+
+	var notFound *NotFoundError
+	if errors.As(err, &notFound) {
+		return false, 0
+	}
+
+	// Network/transport errors and anything else unexpected: retry.
+	return true, 0
+}
+
+// parseRetryAfter parses a Retry-After header value (delay seconds form only).
+func parseRetryAfter(v string) int {
+	if v == "" {
+		return 0
+	}
+	if secs, err := strconv.Atoi(strings.TrimSpace(v)); err == nil && secs > 0 {
+		return secs
+	}
+	return 0
+}
+
+// statusToError maps a non-2xx HTTP status to a typed error: 401 -> *AuthError,
+// 429 -> *RateLimitError (honouring Retry-After), everything else -> *statusError.
+func statusToError(code int, header http.Header, body []byte) error {
+	switch code {
+	case http.StatusUnauthorized:
+		return &AuthError{StatusCode: code, Message: string(body)}
+	case http.StatusTooManyRequests:
+		after := 0
+		if header != nil {
+			after = parseRetryAfter(header.Get("Retry-After"))
+		}
+		return &RateLimitError{RetryAfter: after}
+	default:
+		return &statusError{StatusCode: code, Body: string(body)}
+	}
 }
 
 // ListProducts returns all available BDDS products
@@ -210,7 +317,7 @@ func (c *Client) ListProducts(ctx context.Context) ([]*Product, error) {
 		}
 
 		if resp.StatusCode() != http.StatusOK {
-			return fmt.Errorf("unexpected status %d: %s", resp.StatusCode(), string(resp.Body))
+			return statusToError(resp.StatusCode(), resp.HTTPResponse.Header, resp.Body)
 		}
 
 		if resp.JSON200 == nil {
@@ -248,7 +355,7 @@ func (c *Client) GetProduct(ctx context.Context, productID int) (*ProductWithDel
 		}
 
 		if resp.StatusCode() != http.StatusOK {
-			return fmt.Errorf("unexpected status %d: %s", resp.StatusCode(), string(resp.Body))
+			return statusToError(resp.StatusCode(), resp.HTTPResponse.Header, resp.Body)
 		}
 
 		if resp.JSON200 == nil {
@@ -303,7 +410,7 @@ func (c *Client) DownloadFileWithProgress(ctx context.Context, productID, delive
 		if err != nil {
 			return err
 		}
-		defer resp.Body.Close()
+		defer func() { _ = resp.Body.Close() }()
 
 		if resp.StatusCode == http.StatusNotFound {
 			return &NotFoundError{
@@ -314,7 +421,7 @@ func (c *Client) DownloadFileWithProgress(ctx context.Context, productID, delive
 
 		if resp.StatusCode != http.StatusOK {
 			body, _ := io.ReadAll(resp.Body)
-			return fmt.Errorf("unexpected status %d: %s", resp.StatusCode, string(body))
+			return statusToError(resp.StatusCode, resp.Header, body)
 		}
 
 		// If progress callback provided, wrap reader
@@ -365,14 +472,37 @@ func (c *Client) GetLatestDelivery(ctx context.Context, productID int) (*Deliver
 		}
 	}
 
-	// Find the delivery with the latest publication date
-	latest := product.Deliveries[0]
-	for _, d := range product.Deliveries[1:] {
-		if d.DeliveryPublicationDatetime.After(latest.DeliveryPublicationDatetime) {
+	// Find the latest data delivery. EPO mixes administrative/notification
+	// deliveries (e.g. "NOTIFICATION: NEW DTD ...") into the same list; those are
+	// noisy and not representative of the product's actual data, so prefer real
+	// data deliveries and only fall back to the overall latest if none qualify.
+	var latest, latestData *Delivery
+	for _, d := range product.Deliveries {
+		if latest == nil || d.DeliveryPublicationDatetime.After(latest.DeliveryPublicationDatetime) {
 			latest = d
+		}
+		if isNotificationDelivery(d.DeliveryName) {
+			continue
+		}
+		if latestData == nil || d.DeliveryPublicationDatetime.After(latestData.DeliveryPublicationDatetime) {
+			latestData = d
 		}
 	}
 
+	if latestData != nil {
+		return latestData, nil
+	}
 	return latest, nil
 }
 
+// isNotificationDelivery reports whether a delivery is an administrative or
+// notification entry rather than an actual data delivery.
+func isNotificationDelivery(name string) bool {
+	upper := strings.ToUpper(name)
+	for _, marker := range []string{"NOTIFICATION", "INFO:", "ANNOUNCEMENT"} {
+		if strings.Contains(upper, marker) {
+			return true
+		}
+	}
+	return false
+}

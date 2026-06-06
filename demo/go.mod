@@ -1,6 +1,6 @@
-module demo
+module github.com/patent-dev/epo-bdds/demo
 
-go 1.25.0
+go 1.26.1
 
 require github.com/patent-dev/epo-bdds v0.0.0
 

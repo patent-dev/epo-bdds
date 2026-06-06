@@ -30,3 +30,15 @@ type RateLimitError struct {
 func (e *RateLimitError) Error() string {
 	return fmt.Sprintf("rate limited, retry after %d seconds", e.RetryAfter)
 }
+
+// statusError represents an unexpected HTTP status response. It carries the
+// status code so retry logic can distinguish transient (5xx) from permanent
+// (4xx) failures.
+type statusError struct {
+	StatusCode int
+	Body       string
+}
+
+func (e *statusError) Error() string {
+	return fmt.Sprintf("unexpected status %d: %s", e.StatusCode, e.Body)
+}

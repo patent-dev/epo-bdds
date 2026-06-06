@@ -24,11 +24,11 @@ func TestDefaultConfig(t *testing.T) {
 	if config.MaxRetries != 3 {
 		t.Errorf("Expected MaxRetries to be 3, got %d", config.MaxRetries)
 	}
-	if config.RetryDelay != 1 {
-		t.Errorf("Expected RetryDelay to be 1, got %d", config.RetryDelay)
+	if config.RetryDelay != time.Second {
+		t.Errorf("Expected RetryDelay to be 1s, got %s", config.RetryDelay)
 	}
-	if config.Timeout != 30 {
-		t.Errorf("Expected Timeout to be 30, got %d", config.Timeout)
+	if config.Timeout != 30*time.Second {
+		t.Errorf("Expected Timeout to be 30s, got %s", config.Timeout)
 	}
 }
 
@@ -50,7 +50,7 @@ func TestClientWithMockServer(t *testing.T) {
 	authServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/oauth2/aus3up3nz0N133c0V417/v1/token" {
 			w.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
 				"access_token": "test-token-12345",
 				"token_type":   "Bearer",
 				"expires_in":   3600,
@@ -68,7 +68,7 @@ func TestClientWithMockServer(t *testing.T) {
 		auth := r.Header.Get("Authorization")
 		if !strings.HasPrefix(auth, "Bearer ") {
 			w.WriteHeader(http.StatusUnauthorized)
-			w.Write([]byte(`{"error":"unauthorized"}`))
+			_, _ = w.Write([]byte(`{"error":"unauthorized"}`))
 			return
 		}
 
@@ -77,7 +77,7 @@ func TestClientWithMockServer(t *testing.T) {
 		switch {
 		case r.URL.Path == "/bdds/bdds-bff-service/prod/api/products/":
 			// List products response
-			json.NewEncoder(w).Encode([]map[string]interface{}{
+			_ = json.NewEncoder(w).Encode([]map[string]interface{}{
 				{
 					"id":          3,
 					"name":        "EP DocDB front file",
@@ -99,11 +99,11 @@ func TestClientWithMockServer(t *testing.T) {
 			// File download - check this before products/{id}
 			w.Header().Set("Content-Type", "application/octet-stream")
 			w.Header().Set("Content-Length", "17")
-			w.Write([]byte("test-file-content"))
+			_, _ = w.Write([]byte("test-file-content"))
 
 		case r.URL.Path == "/bdds/bdds-bff-service/prod/api/products/3":
 			// Get product 3 with deliveries
-			json.NewEncoder(w).Encode(map[string]interface{}{
+			_ = json.NewEncoder(w).Encode(map[string]interface{}{
 				"id":          3,
 				"name":        "EP DocDB front file",
 				"description": "EP DocDB front file - bibliographic data",
@@ -144,7 +144,7 @@ func TestClientWithMockServer(t *testing.T) {
 		case r.URL.Path == "/bdds/bdds-bff-service/prod/api/products/999":
 			// Product not found
 			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte(`{"error":"product not found"}`))
+			_, _ = w.Write([]byte(`{"error":"product not found"}`))
 
 		default:
 			http.NotFound(w, r)
@@ -159,7 +159,7 @@ func TestClientWithMockServer(t *testing.T) {
 		Password:  "test-pass",
 		BaseURL:   apiServer.URL,
 		UserAgent: "Test/1.0",
-		Timeout:   10,
+		Timeout:   10 * time.Second,
 	}
 
 	client, err := NewClient(config)
@@ -276,7 +276,7 @@ func TestClientWithMockServer(t *testing.T) {
 	t.Run("DownloadFileWithProgress", func(t *testing.T) {
 		var buf bytes.Buffer
 		progressCalled := false
-		err := client.DownloadFileWithProgress(ctx, 3, 12345, 67890, &buf, func(current, total int64) {
+		err := client.DownloadFileWithProgress(ctx, 3, 12345, 67890, &buf, func(_, total int64) {
 			progressCalled = true
 			if total != 17 {
 				t.Errorf("Expected total bytes 17, got %d", total)
@@ -338,7 +338,7 @@ func TestTokenExpiry(t *testing.T) {
 
 	// ensureValidToken should detect expiry
 	// (will fail to refresh in this test, but that's expected)
-	err = client.ensureValidToken(context.Background())
+	_, err = client.ensureValidToken(context.Background())
 	if err == nil {
 		t.Error("Expected error when refreshing with invalid credentials")
 	}

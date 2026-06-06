@@ -1,3 +1,5 @@
+// Command demo is an interactive command-line tool that exercises the EPO BDDS
+// client: listing products, inspecting deliveries, and downloading files.
 package main
 
 import (
@@ -49,6 +51,17 @@ func main() {
 	}
 
 	ctx := context.Background()
+
+	// Non-interactive example recorder: `go run . examples` writes the JSON
+	// metadata responses to demo/examples (used by the weekly response-watch).
+	if len(os.Args) > 1 && os.Args[1] == "examples" {
+		if err := recordExamples(ctx, client); err != nil {
+			fmt.Printf("Error recording examples: %v\n", err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	reader := bufio.NewReader(os.Stdin)
 
 	for {
@@ -291,7 +304,7 @@ func downloadFile(ctx context.Context, client *bdds.Client, reader *bufio.Reader
 		fmt.Printf("Error creating file: %v\n", err)
 		return
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	startTime := time.Now()
 	var lastUpdate time.Time
@@ -322,7 +335,7 @@ func downloadFile(ctx context.Context, client *bdds.Client, reader *bufio.Reader
 
 	if err != nil {
 		fmt.Printf("Error downloading file: %v\n", err)
-		os.Remove(filename)
+		_ = os.Remove(filename)
 		return
 	}
 

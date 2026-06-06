@@ -1,20 +1,24 @@
 # EPO BDDS Go Client
 
+[![CI](https://github.com/patent-dev/epo-bdds/actions/workflows/ci.yml/badge.svg)](https://github.com/patent-dev/epo-bdds/actions/workflows/ci.yml)
 [![Go Reference](https://pkg.go.dev/badge/github.com/patent-dev/epo-bdds.svg)](https://pkg.go.dev/github.com/patent-dev/epo-bdds)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Go Report Card](https://goreportcard.com/badge/github.com/patent-dev/epo-bdds)](https://goreportcard.com/report/github.com/patent-dev/epo-bdds)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A Go client library for the European Patent Office Bulk Data Distribution Service (BDDS).
+A Go client for the European Patent Office's Bulk Data Distribution Service
+(BDDS) REST API - product discovery, delivery listing, and downloading of bulk
+datasets such as DOCDB, INPADOC, and EP full-text.
 
-## Getting Started
+## Overview
 
-### Authentication
-
-Authentication requirements depend on the data you're accessing:
-
-- **Free/Public Products**: Listing and downloading work without authentication
-- **Paid Products**: Require EPO BDDS subscription and authentication for listing and downloading (see [pricing](https://www.epo.org/en/service-support/ordering/patent-knowledge-products-services))
-
-**Authentication Method**: OAuth2 password grant flow
+- **Product discovery** - list products, fetch a product with its deliveries,
+  look up a product by name, get the latest delivery.
+- **File downloads** - stream a delivery file to any `io.Writer`, with an
+  optional progress callback for large files.
+- **Automatic auth** - OAuth2 password grant; tokens are cached and refreshed
+  before expiry. Credentials are optional: free/public products work without them.
+- **Robust requests** - retry with backoff and automatic re-authentication on
+  expiry; typed errors for the common failure cases.
 
 ## Installation
 
@@ -22,7 +26,28 @@ Authentication requirements depend on the data you're accessing:
 go get github.com/patent-dev/epo-bdds
 ```
 
-## Quick Start
+## Getting access
+
+Free/public BDDS products can be listed and downloaded without an account. Paid
+products require an EPO account with a subscription to the relevant product; the
+client then authenticates via OAuth2 password grant.
+
+1. Open the [BDDS portal](https://publication-bdds.apps.epo.org) to browse the
+   product catalogue, then start sign-in / registration.
+
+2. Sign in with your EPO account, or create one at the
+   [EPO login](https://login.epo.org).
+
+3. Subscribe to the products you need (free/public products need no subscription).
+
+4. Export your EPO credentials for the client and demo:
+   ```bash
+   export EPO_BDDS_USERNAME=...
+   export EPO_BDDS_PASSWORD=...
+   ```
+
+
+## Quick start
 
 ```go
 package main
@@ -32,23 +57,18 @@ import (
     "fmt"
     "log"
 
-    "github.com/patent-dev/epo-bdds"
+    bdds "github.com/patent-dev/epo-bdds"
 )
 
 func main() {
-    // Create client
-    client, err := bdds.NewClient(&bdds.Config{
-        Username: "your-epo-username",
-        Password: "your-epo-password",
-    })
+    // Credentials are optional: free/public products (including ListProducts)
+    // work without them. Pass a Config with Username/Password for paid products.
+    client, err := bdds.NewClient(nil)
     if err != nil {
         log.Fatal(err)
     }
 
-    ctx := context.Background()
-
-    // List all products
-    products, err := client.ListProducts(ctx)
+    products, err := client.ListProducts(context.Background())
     if err != nil {
         log.Fatal(err)
     }
@@ -60,167 +80,75 @@ func main() {
 }
 ```
 
-## API Methods
+## Usage
 
-### Product Discovery
-
-```go
-// List all available products
-ListProducts(ctx context.Context) ([]*Product, error)
-
-// Get product details with deliveries
-GetProduct(ctx context.Context, productID int) (*ProductWithDeliveries, error)
-
-// Find product by name
-GetProductByName(ctx context.Context, name string) (*Product, error)
-
-// Get most recent delivery for a product
-GetLatestDelivery(ctx context.Context, productID int) (*Delivery, error)
-```
-
-### File Downloads
-
-```go
-// Download file to writer
-DownloadFile(ctx context.Context, productID, deliveryID, fileID int, dst io.Writer) error
-
-// Download with progress callback
-DownloadFileWithProgress(ctx context.Context, productID, deliveryID, fileID int,
-    dst io.Writer, progressFn func(bytesWritten, totalBytes int64)) error
-```
-
-## Configuration
+### Configuration
 
 ```go
 config := &bdds.Config{
-    Username:   "your-username",          // Optional (needed for paid products)
-    Password:   "your-password",          // Optional (needed for paid products)
-    BaseURL:    "https://publication-bdds.apps.epo.org", // Default
-    UserAgent:  "YourApp/1.0",           // Optional
-    MaxRetries: 3,                        // Default: 3
-    RetryDelay: 1,                        // Seconds between retries, default: 1
-    Timeout:    30,                       // Request timeout in seconds, default: 30
+    Username:   "your-username",                          // optional, needed for paid products
+    Password:   "your-password",                          // optional, needed for paid products
+    BaseURL:    "https://publication-bdds.apps.epo.org",  // default
+    UserAgent:  "YourApp/1.0",                            // optional
+    MaxRetries: 3,                                        // default: 3
+    RetryDelay: time.Second,                              // delay between retries, default: 1s
+    Timeout:    30 * time.Second,                         // request timeout, default: 30s
 }
 
 client, err := bdds.NewClient(config)
 ```
 
-## Features
+`RetryDelay` and `Timeout` are `time.Duration` values.
 
-### Automatic Token Management
-- OAuth2 authentication handled automatically
-- Tokens cached and refreshed before expiry
-- No manual token management required
-
-### Robust Error Handling
-- Automatic retry with exponential backoff
-- Graceful handling of rate limits
-- Custom error types for different scenarios
-
-### Progress Tracking
-- Download progress callbacks for large files
-- Real-time byte tracking during downloads
-
-## Usage Examples
-
-### Download Without Authentication
-
-If you only need to download files and already have the product/delivery/file IDs:
+### Product discovery
 
 ```go
-// Create client without credentials
-client, err := bdds.NewClient(&bdds.Config{})
-if err != nil {
-    log.Fatal(err)
-}
-
-// Download file directly
-file, err := os.Create("download.zip")
-if err != nil {
-    log.Fatal(err)
-}
-defer file.Close()
-
-err = client.DownloadFile(ctx, productID, deliveryID, fileID, file)
-if err != nil {
-    log.Fatal(err)
-}
-```
-
-### List Products
-
-```go
+// List all available products.
 products, err := client.ListProducts(ctx)
-if err != nil {
-    log.Fatal(err)
-}
 
-for _, p := range products {
-    fmt.Printf("Product %d: %s\n", p.ID, p.Name)
-    fmt.Printf("  %s\n", p.Description)
-}
-```
-
-### Get Product with Deliveries
-
-```go
+// Get a product with its deliveries.
 product, err := client.GetProduct(ctx, 3) // EP DocDB front file
-if err != nil {
-    log.Fatal(err)
-}
 
-fmt.Printf("Product: %s\n", product.Name)
-fmt.Printf("Deliveries: %d\n", len(product.Deliveries))
-
-for _, delivery := range product.Deliveries {
-    fmt.Printf("  %s - %d files\n", delivery.DeliveryName, len(delivery.Files))
-}
-```
-
-### Download File with Progress
-
-```go
-file, err := os.Create("download.zip")
-if err != nil {
-    log.Fatal(err)
-}
-defer file.Close()
-
-err = client.DownloadFileWithProgress(ctx, 3, 12345, 67890, file,
-    func(bytesWritten, totalBytes int64) {
-        percent := float64(bytesWritten) * 100 / float64(totalBytes)
-        fmt.Printf("\rProgress: %.1f%%", percent)
-    })
-if err != nil {
-    log.Fatal(err)
-}
-```
-
-### Find Product by Name
-
-```go
+// Find a product by name.
 product, err := client.GetProductByName(ctx, "EP DocDB front file")
-if err != nil {
-    log.Fatal(err)
-}
 
-fmt.Printf("Found product: %d - %s\n", product.ID, product.Name)
+// Get the most recent delivery for a product.
+delivery, err := client.GetLatestDelivery(ctx, 3)
 ```
 
-### Get Latest Delivery
+`GetProduct` returns a `*ProductWithDeliveries`; each delivery lists its files:
 
 ```go
-delivery, err := client.GetLatestDelivery(ctx, 3)
+for _, d := range product.Deliveries {
+    fmt.Printf("%s - %d files\n", d.DeliveryName, len(d.Files))
+}
+```
+
+### File downloads
+
+If you already have the product, delivery, and file IDs, downloads work without
+credentials:
+
+```go
+f, err := os.Create("download.zip")
 if err != nil {
     log.Fatal(err)
 }
+defer f.Close()
 
-fmt.Printf("Latest delivery: %s\n", delivery.DeliveryName)
-fmt.Printf("Published: %s\n", delivery.DeliveryPublicationDatetime)
-fmt.Printf("Files: %d\n", len(delivery.Files))
+err = client.DownloadFile(ctx, productID, deliveryID, fileID, f)
 ```
 
-## Common Product IDs
+Use `DownloadFileWithProgress` for a progress callback on large files:
+
+```go
+err = client.DownloadFileWithProgress(ctx, 3, 12345, 67890, f,
+    func(bytesWritten, totalBytes int64) {
+        fmt.Printf("\rProgress: %.1f%%", float64(bytesWritten)*100/float64(totalBytes))
+    })
+```
+
+### Common product IDs
 
 | ID | Name | Description |
 |----|------|-------------|
@@ -230,144 +158,75 @@ fmt.Printf("Files: %d\n", len(delivery.Files))
 | 17 | PATSTAT Global | Patent statistics database |
 | 18 | PATSTAT EP Register | EP register data |
 
-## Error Handling
+### Demo
 
-The library provides custom error types for different scenarios:
+An interactive demo exercises every method. Set credentials and run it:
+
+```bash
+export EPO_BDDS_USERNAME=your-username
+export EPO_BDDS_PASSWORD=your-password
+cd demo && go run demo.go
+```
+
+See [demo/README.md](demo/README.md) for details.
+
+## Error handling
+
+The library returns typed errors you can match with `errors.As`:
 
 ```go
-// Authentication errors
-if authErr, ok := err.(*bdds.AuthError); ok {
-    fmt.Printf("Auth failed: %s\n", authErr.Message)
+var authErr *bdds.AuthError
+if errors.As(err, &authErr) {
+    fmt.Printf("auth failed (status %d): %s\n", authErr.StatusCode, authErr.Message)
 }
 
-// Not found errors
-if notFoundErr, ok := err.(*bdds.NotFoundError); ok {
-    fmt.Printf("Resource not found: %s\n", notFoundErr.ID)
+var notFound *bdds.NotFoundError
+if errors.As(err, &notFound) {
+    fmt.Printf("%s not found: %s\n", notFound.Resource, notFound.ID)
 }
 
-// Rate limit errors
-if rateLimitErr, ok := err.(*bdds.RateLimitError); ok {
-    fmt.Printf("Rate limited, retry after %d seconds\n", rateLimitErr.RetryAfter)
+var rateLimit *bdds.RateLimitError
+if errors.As(err, &rateLimit) {
+    fmt.Printf("rate limited, retry after %d seconds\n", rateLimit.RetryAfter)
 }
 ```
 
 ## Testing
 
-This library includes comprehensive test coverage:
-
-### Unit Tests (Mock Server)
-
-Offline tests using mock HTTP server with realistic responses:
-
 ```bash
-# Run unit tests
-go test -v
-
-# Run with coverage
-go test -v -cover
-
-# Generate coverage report
-go test -cover -coverprofile=coverage.out
-go tool cover -html=coverage.out
+make test              # unit tests (mock HTTP server, race)
+make test-integration  # integration tests against the real API, needs credentials
+make lint
 ```
 
-### Integration Tests (Real API)
-
-Tests that make actual requests to the EPO BDDS API:
+Integration tests require valid EPO BDDS credentials and skip gracefully when
+they are not set or a product is not accessible for your account:
 
 ```bash
-# Set credentials
 export EPO_BDDS_USERNAME=your-username
 export EPO_BDDS_PASSWORD=your-password
-
-# Run integration tests
-go test -tags=integration -v
-
-# Run specific test
-go test -tags=integration -v -run TestIntegration_ListProducts
 ```
 
-**Note**: Integration tests require valid EPO BDDS credentials and will fail gracefully if not set or if specific products are not accessible (based on account).
+## Regenerating from OpenAPI
 
-## Implementation
-
-This library follows a clean architecture:
-
-1. **OpenAPI Specification**: Unofficial hand-crafted `openapi.yaml` based on actual API behavior
-2. **Code Generation**: Types and client generated using [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen)
-3. **Idiomatic Wrapper**: Clean Go client wrapping generated code
-4. **Automatic Auth**: OAuth2 token management handled transparently
-
-### Package Structure
-
-```
-├── client.go           # Main client implementation
-├── client_test.go     # Unit tests with mock server
-├── integration_test.go # Integration tests with real API
-├── types.go           # Public types
-├── errors.go          # Custom error types
-├── utils.go           # Internal utilities
-├── generated/         # Auto-generated code
-│   ├── types_gen.go   # Generated types
-│   └── client_gen.go  # Generated client
-└── openapi.yaml      # OpenAPI 3.0 specification
-```
-
-## Demo Application
-
-An interactive demo application is included to showcase all library features:
+The typed code under `generated/` is produced from the hand-crafted `openapi.yaml`
+with [oapi-codegen](https://github.com/oapi-codegen/oapi-codegen). If you change
+the spec, regenerate it:
 
 ```bash
-# Set credentials
-export EPO_BDDS_USERNAME=your-username
-export EPO_BDDS_PASSWORD=your-password
-
-# Run demo
-cd demo
-go run demo.go
+make generate
 ```
 
-The demo provides an interactive menu for:
-- Listing all products
-- Viewing product details with deliveries
-- Finding products by name
-- Getting latest delivery information
-- Downloading files with progress tracking
-
-See [demo/README.md](demo/README.md) for full documentation.
-
-## Development
-
-### Regenerating from OpenAPI
-
-If the OpenAPI spec is updated:
-
-```bash
-# Install generator
-go install github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@latest
-
-# Generate types
-oapi-codegen -package generated -generate types openapi.yaml > generated/types_gen.go
-
-# Generate client
-oapi-codegen -package generated -generate client openapi.yaml > generated/client_gen.go
-```
-
-## Related Projects
+## Related projects
 
 Part of the [patent.dev](https://patent.dev) open-source patent data ecosystem:
 
-- [uspto-odp](https://github.com/patent-dev/uspto-odp) - USPTO Open Data Portal client (search, PTAB, XML full text)
-- [epo-ops](https://github.com/patent-dev/epo-ops) - EPO Open Patent Services client (search, biblio, legal status, family, images)
+- [epo-ops](https://github.com/patent-dev/epo-ops) - EPO Open Patent Services client (bibliographic, full text, families, legal status, images)
+- [uspto-odp](https://github.com/patent-dev/uspto-odp) - USPTO Open Data Portal client (patents, PTAB, TSDR, full text)
 - [dpma-connect-plus](https://github.com/patent-dev/dpma-connect-plus) - DPMA Connect Plus client (patents, designs, trademarks)
 
 The [bulk-file-loader](https://github.com/patent-dev/bulk-file-loader) uses these libraries for automated patent data downloads.
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) file for details.
-
-## Credits
-
-**Developed by:**
-- Wolfgang Stark - [patent.dev](https://patent.dev) - [Funktionslust GmbH](https://funktionslust.digital)
+MIT - Funktionslust GmbH / patent.dev.

@@ -5,3 +5,12 @@ demo/*.zip
 demo/*.tar.gz
 demo/downloads/
 epo-bdds-demo
+# Compiled demo binary
+demo/demo
+# Local agent/tooling config
+.claude/
+
+# Test/coverage output
+coverage.out
+*.out
+coverage.html

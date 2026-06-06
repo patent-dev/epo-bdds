@@ -31,7 +31,7 @@ func TestIntegration_Authentication(t *testing.T) {
 	config := &Config{
 		Username: username,
 		Password: password,
-		Timeout:  30,
+		Timeout:  30 * time.Second,
 	}
 
 	client, err := NewClient(config)
@@ -43,7 +43,7 @@ func TestIntegration_Authentication(t *testing.T) {
 	defer cancel()
 
 	// Force authentication
-	err = client.authenticate(ctx)
+	_, err = client.ensureValidToken(ctx)
 	if err != nil {
 		t.Fatalf("Authentication failed: %v", err)
 	}
@@ -52,7 +52,7 @@ func TestIntegration_Authentication(t *testing.T) {
 		t.Error("Expected token to be set after authentication")
 	}
 
-	t.Logf("✓ Authentication successful")
+	t.Logf("OK Authentication successful")
 	t.Logf("Token expires at: %s", client.tokenExpiry.Format(time.RFC3339))
 }
 
@@ -87,7 +87,7 @@ func TestIntegration_ListProducts(t *testing.T) {
 		t.Error("Expected at least one product")
 	}
 
-	t.Logf("✓ Found %d products:", len(products))
+	t.Logf("OK Found %d products:", len(products))
 	for _, p := range products {
 		t.Logf("  - [ID: %d] %s", p.ID, p.Name)
 	}
@@ -127,7 +127,7 @@ func TestIntegration_GetProduct(t *testing.T) {
 				return
 			}
 
-			t.Logf("✓ Product %d: %s", product.ID, product.Name)
+			t.Logf("OK Product %d: %s", product.ID, product.Name)
 			t.Logf("  Deliveries: %d", len(product.Deliveries))
 
 			if len(product.Deliveries) > 0 {
@@ -181,7 +181,7 @@ func TestIntegration_GetProductByName(t *testing.T) {
 		t.Errorf("Expected product name %s, got %s", targetName, product.Name)
 	}
 
-	t.Logf("✓ Found product by name: %s", product.Name)
+	t.Logf("OK Found product by name: %s", product.Name)
 }
 
 // TestIntegration_GetLatestDelivery tests getting latest delivery
@@ -213,7 +213,7 @@ func TestIntegration_GetLatestDelivery(t *testing.T) {
 		t.Skip("Product might not be accessible")
 	}
 
-	t.Logf("✓ Latest delivery for product 3:")
+	t.Logf("OK Latest delivery for product 3:")
 	t.Logf("  Name: %s", delivery.DeliveryName)
 	t.Logf("  Published: %s", delivery.DeliveryPublicationDatetime.Format(time.RFC3339))
 	t.Logf("  Files: %d", len(delivery.Files))

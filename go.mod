@@ -1,6 +1,6 @@
 module github.com/patent-dev/epo-bdds
 
-go 1.25.0
+go 1.26.1
 
 require github.com/oapi-codegen/runtime v1.1.2
 
