@@ -1,0 +1,91 @@
+{
+  "endpoint": "list_products",
+  "request": {
+    "description": "GET /products"
+  },
+  "response": {
+    "status": 200,
+    "body": [
+      {
+        "ID": 5,
+        "Name": "14.11 EPO worldwide legal event data (INPADOC) - front file",
+        "Description": "The product 14.11 contains legal event data and includes records from over 60 international patent authorities. INPADOC back file is available annually ."
+      },
+      {
+        "ID": 11,
+        "Name": "14.11  EPO worldwide legal event data (INPADOC) back file ",
+        "Description": "EPO worldwide legal event data (INPADOC) back file, available yearly."
+      },
+      {
+        "ID": 20,
+        "Name": "Samples of bulk data sets",
+        "Description": "This section contains EPO bulk data product samples. "
+      },
+      {
+        "ID": 10,
+        "Name": "14.1 EP bibliographic data EBD",
+        "Description": "EBD provides details of all newly published applications and patents, as well as recent changes to previously published patents. The data includes the date of filing, titles, applicant data, classification and priority data. It is the same as the data in the European Patent Bulletin. \nNew weekly exchange files are available every Wednesday at 14.00 hrs CET/CEST."
+      },
+      {
+        "ID": 19,
+        "Name": "DTD/Schema repository",
+        "Description": "Most recent DTDs and schemas for EPO bulk data sets."
+      },
+      {
+        "ID": 3,
+        "Name": "14.7  EPO worldwide bibliographic data (DOCDB) - front file",
+        "Description": "DOCDB - EPO worldwide bibliographic data is an extraction in XML format of our master documentation database with worldwide coverage containing bibliographic data, abstracts and citations (but no full text). This is a front file, back file data is available under the DOCDB back file folder."
+      },
+      {
+        "ID": 21,
+        "Name": "14.6 EPO Boards of Appeal decisions",
+        "Description": "This file is the collection of all the BoA decisions available on the day of the database extraction. Each update includes the complete set of decisions from 1978 onwards (published as of 1979) to date.  New updates are published every March and September."
+      },
+      {
+        "ID": 14,
+        "Name": "14.7 EPO worldwide bibliographic data (DOCDB) back file",
+        "Description": "EPO worldwide bibliographic data (DOCDB) back file. Available yearly. The 2025 backfile will be extracted in week 09/2025 and made available in week 10/2025. "
+      },
+      {
+        "ID": 24,
+        "Name": "14.15 Sequence listings",
+        "Description": "This product contains the sequence listings of nucleotides or amino acids from EP, Euro-PCT and PCT publications where the EPO is the International Searching Authority.\nThe bulk data set contains gene sequences  also called sequence listings files from 1989 to date. New weekly files are available every Monday, at 12:00 CET/CEST."
+      },
+      {
+        "ID": 16,
+        "Name": "14.1.1 European Patent Register data - back file",
+        "Description": "Snapshot of the European Patent Register in XML, available 2 x year - February, August."
+      },
+      {
+        "ID": 32,
+        "Name": "14.12 EP full-text data",
+        "Description": "EP full-text data contains all EP-A and EP-B publications published by EPO from the 1970s to date. Newly published ZIP files with PDF/A and XML will be accessible every Wednesday at 14:00 CET/CEST."
+      },
+      {
+        "ID": 31,
+        "Name": "Weekly updated coverage, codes and statistics",
+        "Description": "\"Publication, application, and priority numbers concordance table\" is a weekly updated table describing various number formats used in EPO's prior art collection.\nThe table also contains a worksheet with ST30 Date of Public Availability tags available in datasets like DOCDB in XML. The weekly updated Concordance table is loaded every Wednesday at 15:00 CET.\n\n\nWe also publish weekly updates of the coverage tables of  DOCDB in XML and INPADOC legal events. These tables are available every Thursday at 9:00 CET."
+      },
+      {
+        "ID": 5,
+        "Name": "14.11 EPO worldwide legal event data (INPADOC) - front file",
+        "Description": "The product 14.11 contains legal event data and includes records from over 60 international patent authorities. INPADOC back file is available annually ."
+      },
+      {
+        "ID": 11,
+        "Name": "14.11  EPO worldwide legal event data (INPADOC) back file ",
+        "Description": "EPO worldwide legal event data (INPADOC) back file, available yearly."
+      },
+      {
+        "ID": 3,
+        "Name": "14.7  EPO worldwide bibliographic data (DOCDB) - front file",
+        "Description": "DOCDB - EPO worldwide bibliographic data is an extraction in XML format of our master documentation database with worldwide coverage containing bibliographic data, abstracts and citations (but no full text). This is a front file, back file data is available under the DOCDB back file folder."
+      },
+      {
+        "ID": 14,
+        "Name": "14.7 EPO worldwide bibliographic data (DOCDB) back file",
+        "Description": "EPO worldwide bibliographic data (DOCDB) back file. Available yearly. The 2025 backfile will be extracted in week 09/2025 and made available in week 10/2025. "
+      }
+    ]
+  }
+}

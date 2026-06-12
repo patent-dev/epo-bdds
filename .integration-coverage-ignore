@@ -1,0 +1,6 @@
+# Non-endpoint exported Client methods to exclude from the integration-coverage
+# check, one name per line. EPO BDDS has none: all six exported Client methods
+# (ListProducts, GetProduct, GetProductByName, GetLatestDelivery, DownloadFile,
+# DownloadFileWithProgress) are real endpoints with a per-endpoint integration
+# test. (The auth helpers ensureValidToken/clearToken/authRequestEditor are
+# unexported and never match the coverage script's exported-method grep.)

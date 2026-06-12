@@ -1,0 +1,874 @@
+{
+  "endpoint": "get_product",
+  "request": {
+    "description": "GET /products/5"
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "ID": 5,
+      "Name": "14.11 EPO worldwide legal event data (INPADOC) - front file",
+      "Description": "The product 14.11 contains legal event data and includes records from over 60 international patent authorities. INPADOC back file is available annually .",
+      "Deliveries": [
+        {
+          "DeliveryID": 3267,
+          "DeliveryName": "NOTIFICATION: NEW DTD - NEW ELEMENTS IN XML",
+          "DeliveryPublicationDatetime": "2026-06-03T12:50:00+02:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9431,
+              "FileName": "20260603_NEW_ELEMENTS.docx",
+              "FileSize": "17.7 kB",
+              "FileChecksum": "8B428D49F3BB3C19C5FFD7035EDCE1824ED45149",
+              "FilePublicationDatetime": "2026-06-03T12:50:00+02:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3262,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/023",
+          "DeliveryPublicationDatetime": "2026-06-02T09:00:00+02:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9416,
+              "FileName": "legstat_xml_202623.zip",
+              "FileSize": "216.6 MB",
+              "FileChecksum": "F30378B303DA95087423E752F776ADD4DA5DB262",
+              "FilePublicationDatetime": "2026-06-02T09:00:00+02:00"
+            },
+            {
+              "FileID": 9417,
+              "FileName": "statistics_authority_code_202623.xlsx",
+              "FileSize": "452.1 kB",
+              "FileChecksum": "837DD8DA49AD079DA54863A34967DD59131793A1",
+              "FilePublicationDatetime": "2026-06-02T09:00:00+02:00"
+            },
+            {
+              "FileID": 9418,
+              "FileName": "legal_code_descriptions_202623.xlsx",
+              "FileSize": "325.8 kB",
+              "FileChecksum": "0A17897A47154B35A904114B39BE954B894AE074",
+              "FilePublicationDatetime": "2026-06-02T09:00:00+02:00"
+            },
+            {
+              "FileID": 9419,
+              "FileName": "INPADOC_coverage_202623.xlsx",
+              "FileSize": "902.7 kB",
+              "FileChecksum": "590F5C20120C998D7086594B87E4E4FB1F834BF9",
+              "FilePublicationDatetime": "2026-06-02T09:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3249,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/022",
+          "DeliveryPublicationDatetime": "2026-05-26T09:00:00+02:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9394,
+              "FileName": "legstat_xml_202622.zip",
+              "FileSize": "370.4 MB",
+              "FileChecksum": "62D321B5BF55D9AD38F5082472C2F5A4D048E941",
+              "FilePublicationDatetime": "2026-05-26T09:00:00+02:00"
+            },
+            {
+              "FileID": 9395,
+              "FileName": "statistics_authority_code_202622.xlsx",
+              "FileSize": "452.1 kB",
+              "FileChecksum": "8849F74F3F0C4386EAE6112DCCAC3530B85F7ECB",
+              "FilePublicationDatetime": "2026-05-26T09:00:00+02:00"
+            },
+            {
+              "FileID": 9396,
+              "FileName": "legal_code_descriptions_202622.xlsx",
+              "FileSize": "309.2 kB",
+              "FileChecksum": "3FBE187221001472B236A2521C2FD2FB6C2EBB7B",
+              "FilePublicationDatetime": "2026-05-26T09:00:00+02:00"
+            },
+            {
+              "FileID": 9397,
+              "FileName": "INPADOC_coverage_202622.xlsx",
+              "FileSize": "874.2 kB",
+              "FileChecksum": "72C32D00342CC3967EC4F51650E2ED8D28FF98A9",
+              "FilePublicationDatetime": "2026-05-26T09:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3236,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/021",
+          "DeliveryPublicationDatetime": "2026-05-19T09:00:00+02:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9373,
+              "FileName": "legstat_xml_202621.zip",
+              "FileSize": "115.9 MB",
+              "FileChecksum": "D86E5E3593E77AF4DD6333A43139823399F41970",
+              "FilePublicationDatetime": "2026-05-19T09:00:00+02:00"
+            },
+            {
+              "FileID": 9374,
+              "FileName": "statistics_authority_code_202621.xlsx",
+              "FileSize": "452.2 kB",
+              "FileChecksum": "AB12F1A10945C0189E2F3D686225DB12A8185D07",
+              "FilePublicationDatetime": "2026-05-19T09:00:00+02:00"
+            },
+            {
+              "FileID": 9375,
+              "FileName": "legal_code_descriptions_202621.xlsx",
+              "FileSize": "309.2 kB",
+              "FileChecksum": "E4FCBD2853BB8817B01F72FBBB256FBC428DD988",
+              "FilePublicationDatetime": "2026-05-19T09:00:00+02:00"
+            },
+            {
+              "FileID": 9376,
+              "FileName": "INPADOC_coverage_202621.xlsx",
+              "FileSize": "874.4 kB",
+              "FileChecksum": "4C2F9F0748ADA8F7815875B8508363CDB336F47E",
+              "FilePublicationDatetime": "2026-05-19T09:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3223,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/020",
+          "DeliveryPublicationDatetime": "2026-05-12T09:00:00+02:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9353,
+              "FileName": "legstat_xml_202620.zip",
+              "FileSize": "306.5 MB",
+              "FileChecksum": "7CC371DE6DD50DF4CAEE6875F83029A4DBF7D9B5",
+              "FilePublicationDatetime": "2026-05-12T09:00:00+02:00"
+            },
+            {
+              "FileID": 9354,
+              "FileName": "statistics_authority_code_202620.xlsx",
+              "FileSize": "452.1 kB",
+              "FileChecksum": "E34048F8105E1E410E1898143458C35375A8CF3A",
+              "FilePublicationDatetime": "2026-05-12T09:00:00+02:00"
+            },
+            {
+              "FileID": 9355,
+              "FileName": "legal_code_descriptions_202620.xlsx",
+              "FileSize": "309.2 kB",
+              "FileChecksum": "E4FCBD2853BB8817B01F72FBBB256FBC428DD988",
+              "FilePublicationDatetime": "2026-05-12T09:00:00+02:00"
+            },
+            {
+              "FileID": 9356,
+              "FileName": "INPADOC_coverage_202620.xlsx",
+              "FileSize": "874.2 kB",
+              "FileChecksum": "AE643A10737237597B5C6298DB051E2B159688DA",
+              "FilePublicationDatetime": "2026-05-12T09:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3210,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/019",
+          "DeliveryPublicationDatetime": "2026-05-05T09:00:00+02:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9327,
+              "FileName": "legstat_xml_202619.zip",
+              "FileSize": "616.5 MB",
+              "FileChecksum": "264DE656093CD991F39DC6A6AB47F2420788A9FD",
+              "FilePublicationDatetime": "2026-05-05T09:00:00+02:00"
+            },
+            {
+              "FileID": 9328,
+              "FileName": "statistics_authority_code_202619.xlsx",
+              "FileSize": "452.1 kB",
+              "FileChecksum": "B66CD03ECC10068875E4870E131EDEEE47485C21",
+              "FilePublicationDatetime": "2026-05-05T09:00:00+02:00"
+            },
+            {
+              "FileID": 9329,
+              "FileName": "legal_code_descriptions_202619.xlsx",
+              "FileSize": "309.1 kB",
+              "FileChecksum": "8307C78C88DBF35C376150F161C594526844B0DF",
+              "FilePublicationDatetime": "2026-05-05T09:00:00+02:00"
+            },
+            {
+              "FileID": 9330,
+              "FileName": "INPADOC_coverage_202619.xlsx",
+              "FileSize": "874.1 kB",
+              "FileChecksum": "91C59113F7216C8E22980499146AFCE87C16B447",
+              "FilePublicationDatetime": "2026-05-05T09:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3197,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/018",
+          "DeliveryPublicationDatetime": "2026-04-28T09:00:00+02:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9307,
+              "FileName": "legstat_xml_202618.zip",
+              "FileSize": "902.5 MB",
+              "FileChecksum": "FD291F60A5881D08FCC443314AFA437D925F9180",
+              "FilePublicationDatetime": "2026-04-28T09:00:00+02:00"
+            },
+            {
+              "FileID": 9308,
+              "FileName": "statistics_authority_code_202618.xlsx",
+              "FileSize": "451.7 kB",
+              "FileChecksum": "4B35DCDF60B419FA4AFDED68B265AE859325B42B",
+              "FilePublicationDatetime": "2026-04-28T09:00:00+02:00"
+            },
+            {
+              "FileID": 9309,
+              "FileName": "legal_code_descriptions_202618.xlsx",
+              "FileSize": "309.1 kB",
+              "FileChecksum": "8307C78C88DBF35C376150F161C594526844B0DF",
+              "FilePublicationDatetime": "2026-04-28T09:00:00+02:00"
+            },
+            {
+              "FileID": 9310,
+              "FileName": "INPADOC_coverage_202618.xlsx",
+              "FileSize": "873.6 kB",
+              "FileChecksum": "6A93F2DB26F13529AC048C62D87939D58BE17C3F",
+              "FilePublicationDatetime": "2026-04-28T09:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3184,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/017",
+          "DeliveryPublicationDatetime": "2026-04-21T09:00:00+02:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9281,
+              "FileName": "legstat_xml_202617.zip",
+              "FileSize": "1.5 GB",
+              "FileChecksum": "3BDB7B9FC9F485B19A92AB5548EDF971945DCB14",
+              "FilePublicationDatetime": "2026-04-21T09:00:00+02:00"
+            },
+            {
+              "FileID": 9282,
+              "FileName": "statistics_authority_code_202617.xlsx",
+              "FileSize": "451.7 kB",
+              "FileChecksum": "594D8E56B03B32E07141C5B88FFAAD304F30BD93",
+              "FilePublicationDatetime": "2026-04-21T09:00:00+02:00"
+            },
+            {
+              "FileID": 9283,
+              "FileName": "legal_code_descriptions_202617.xlsx",
+              "FileSize": "309.1 kB",
+              "FileChecksum": "D114D6C62BCF24960BF21461C52263E85F8EC7F6",
+              "FilePublicationDatetime": "2026-04-21T09:00:00+02:00"
+            },
+            {
+              "FileID": 9284,
+              "FileName": "INPADOC_coverage_202617.xlsx",
+              "FileSize": "873.4 kB",
+              "FileChecksum": "FC81E3143CA7C0CFAAFF4CE5A6E05A70C6D5B040",
+              "FilePublicationDatetime": "2026-04-21T09:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3172,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/016",
+          "DeliveryPublicationDatetime": "2026-04-14T09:00:00+02:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9262,
+              "FileName": "legstat_xml_202616.zip",
+              "FileSize": "966.2 MB",
+              "FileChecksum": "A00DAAB5206EC1C7BD7703C63626F2F9973D9358",
+              "FilePublicationDatetime": "2026-04-14T09:00:00+02:00"
+            },
+            {
+              "FileID": 9263,
+              "FileName": "statistics_authority_code_202616.xlsx",
+              "FileSize": "451.4 kB",
+              "FileChecksum": "1D4F44D7506F05CC9E5500DE714CDE28818F3CFF",
+              "FilePublicationDatetime": "2026-04-14T09:00:00+02:00"
+            },
+            {
+              "FileID": 9264,
+              "FileName": "legal_code_descriptions_202616.xlsx",
+              "FileSize": "309.1 kB",
+              "FileChecksum": "D114D6C62BCF24960BF21461C52263E85F8EC7F6",
+              "FilePublicationDatetime": "2026-04-14T09:00:00+02:00"
+            },
+            {
+              "FileID": 9265,
+              "FileName": "INPADOC_coverage_202616.xlsx",
+              "FileSize": "872.7 kB",
+              "FileChecksum": "922BF931913DC0A554A08E09E02AD09B87826833",
+              "FilePublicationDatetime": "2026-04-14T09:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3160,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/015",
+          "DeliveryPublicationDatetime": "2026-04-07T09:00:00+02:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9237,
+              "FileName": "legstat_xml_202615.zip",
+              "FileSize": "299.9 MB",
+              "FileChecksum": "69941D7B4AFF078EB2ECBC3FFB2B31E5C247404E",
+              "FilePublicationDatetime": "2026-04-07T09:00:00+02:00"
+            },
+            {
+              "FileID": 9238,
+              "FileName": "statistics_authority_code_202615.xlsx",
+              "FileSize": "450.1 kB",
+              "FileChecksum": "DB8CC61DBB96EF3536AD553CF0487E1F57AF4191",
+              "FilePublicationDatetime": "2026-04-07T09:00:00+02:00"
+            },
+            {
+              "FileID": 9239,
+              "FileName": "legal_code_descriptions_202615.xlsx",
+              "FileSize": "309.1 kB",
+              "FileChecksum": "13BAA8F1CFFE6F35701A7175E1956E969F263B58",
+              "FilePublicationDatetime": "2026-04-07T09:00:00+02:00"
+            },
+            {
+              "FileID": 9240,
+              "FileName": "INPADOC_coverage_202615.xlsx",
+              "FileSize": "871.2 kB",
+              "FileChecksum": "EB808B90C806ABA7952999C7E3A2F19B2548F4B0",
+              "FilePublicationDatetime": "2026-04-07T09:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3147,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/014",
+          "DeliveryPublicationDatetime": "2026-03-31T09:00:00+02:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9216,
+              "FileName": "legstat_xml_202614.zip",
+              "FileSize": "268.9 MB",
+              "FileChecksum": "0E859AE77C7E7E21A568D3663AA96BDBB4B00CDB",
+              "FilePublicationDatetime": "2026-03-31T09:00:00+02:00"
+            },
+            {
+              "FileID": 9217,
+              "FileName": "statistics_authority_code_202614.xlsx",
+              "FileSize": "450.1 kB",
+              "FileChecksum": "6123655F207A9943F842DF4CF80593E6B5B62CBD",
+              "FilePublicationDatetime": "2026-03-31T09:00:00+02:00"
+            },
+            {
+              "FileID": 9218,
+              "FileName": "legal_code_descriptions_202614.xlsx",
+              "FileSize": "308.7 kB",
+              "FileChecksum": "D04718F9692347959C87FB0A8F58ABACB2528342",
+              "FilePublicationDatetime": "2026-03-31T09:00:00+02:00"
+            },
+            {
+              "FileID": 9219,
+              "FileName": "INPADOC_coverage_202614.xlsx",
+              "FileSize": "871.0 kB",
+              "FileChecksum": "45A3751EA17E73360E8ED95DAADD75D7A8F371DF",
+              "FilePublicationDatetime": "2026-03-31T09:00:00+02:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3134,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/013",
+          "DeliveryPublicationDatetime": "2026-03-24T09:00:00+01:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9195,
+              "FileName": "legstat_xml_202613.zip",
+              "FileSize": "318.5 MB",
+              "FileChecksum": "8AB0B4AD3D3623DF3797D63DA6770EE9CB849E04",
+              "FilePublicationDatetime": "2026-03-24T09:00:00+01:00"
+            },
+            {
+              "FileID": 9196,
+              "FileName": "statistics_authority_code_202613.xlsx",
+              "FileSize": "450.1 kB",
+              "FileChecksum": "B4AEF885E8665A491EA0C878CEE86B4B82007C76",
+              "FilePublicationDatetime": "2026-03-24T09:00:00+01:00"
+            },
+            {
+              "FileID": 9197,
+              "FileName": "legal_code_descriptions_202613.xlsx",
+              "FileSize": "308.7 kB",
+              "FileChecksum": "D04718F9692347959C87FB0A8F58ABACB2528342",
+              "FilePublicationDatetime": "2026-03-24T09:00:00+01:00"
+            },
+            {
+              "FileID": 9198,
+              "FileName": "INPADOC_coverage_202613.xlsx",
+              "FileSize": "870.8 kB",
+              "FileChecksum": "F18723C6425425E2D25377DF57A75D7D61B104A8",
+              "FilePublicationDatetime": "2026-03-24T09:00:00+01:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3125,
+          "DeliveryName": "NOTIFICATION READ ME",
+          "DeliveryPublicationDatetime": "2026-03-18T17:41:00+01:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9183,
+              "FileName": "20260318_INPADOC_OLDDeliveriesRemoved_readme.docx",
+              "FileSize": "16.7 kB",
+              "FileChecksum": "1A4754615E2D65EB9FB40B81347B36ED8248E01D",
+              "FilePublicationDatetime": "2026-03-18T17:41:00+01:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3115,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/012",
+          "DeliveryPublicationDatetime": "2026-03-17T09:00:00+01:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9169,
+              "FileName": "legstat_xml_202612.zip",
+              "FileSize": "381.4 MB",
+              "FileChecksum": "BB535D3185DA305596104B6D723894CAE2D94674",
+              "FilePublicationDatetime": "2026-03-17T09:00:00+01:00"
+            },
+            {
+              "FileID": 9170,
+              "FileName": "statistics_authority_code_202612.xlsx",
+              "FileSize": "449.7 kB",
+              "FileChecksum": "906EF62CC076F4A1EDBA534CBD0F22832DB678C6",
+              "FilePublicationDatetime": "2026-03-17T09:00:00+01:00"
+            },
+            {
+              "FileID": 9171,
+              "FileName": "legal_code_descriptions_202612.xlsx",
+              "FileSize": "308.7 kB",
+              "FileChecksum": "206F4F8EE080EDBB00EBB746229F01442032A8DA",
+              "FilePublicationDatetime": "2026-03-17T09:00:00+01:00"
+            },
+            {
+              "FileID": 9172,
+              "FileName": "INPADOC_coverage_202612.xlsx",
+              "FileSize": "870.2 kB",
+              "FileChecksum": "E088E73CF0C9FECFC6E610CE97AC208C8FCBEA96",
+              "FilePublicationDatetime": "2026-03-17T09:00:00+01:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3101,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/011",
+          "DeliveryPublicationDatetime": "2026-03-10T09:00:00+01:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9137,
+              "FileName": "legstat_xml_202611.zip",
+              "FileSize": "174.3 MB",
+              "FileChecksum": "45E3D82ED7C9F60F442316FED6F564102FD90B05",
+              "FilePublicationDatetime": "2026-03-10T09:00:00+01:00"
+            },
+            {
+              "FileID": 9138,
+              "FileName": "statistics_authority_code_202611.xlsx",
+              "FileSize": "445.1 kB",
+              "FileChecksum": "129CC482B2B225220BCB6074DCD6434BC12DDA1F",
+              "FilePublicationDatetime": "2026-03-10T09:00:00+01:00"
+            },
+            {
+              "FileID": 9139,
+              "FileName": "legal_code_descriptions_202611.xlsx",
+              "FileSize": "308.7 kB",
+              "FileChecksum": "206F4F8EE080EDBB00EBB746229F01442032A8DA",
+              "FilePublicationDatetime": "2026-03-10T09:00:00+01:00"
+            },
+            {
+              "FileID": 9140,
+              "FileName": "INPADOC_coverage_202611.xlsx",
+              "FileSize": "861.4 kB",
+              "FileChecksum": "C28FDB7A13836F344C7571B78AA0FB0C2F006B2D",
+              "FilePublicationDatetime": "2026-03-10T09:00:00+01:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3085,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/010",
+          "DeliveryPublicationDatetime": "2026-03-03T09:00:00+01:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 9114,
+              "FileName": "legstat_xml_202610.zip",
+              "FileSize": "355.7 MB",
+              "FileChecksum": "223B8F381AC36DA19A665594043DC35CB3FD70D3",
+              "FilePublicationDatetime": "2026-03-03T09:00:00+01:00"
+            },
+            {
+              "FileID": 9115,
+              "FileName": "statistics_authority_code_202610.xlsx",
+              "FileSize": "432.9 kB",
+              "FileChecksum": "8498ADACBBA0339AFFFEFF23FC261A8C08A0FAEC",
+              "FilePublicationDatetime": "2026-03-03T09:00:00+01:00"
+            },
+            {
+              "FileID": 9116,
+              "FileName": "legal_code_descriptions_202610.xlsx",
+              "FileSize": "305.2 kB",
+              "FileChecksum": "5E9C57FAB7C2FC770A4A072029CE63F620E00B0C",
+              "FilePublicationDatetime": "2026-03-03T09:00:00+01:00"
+            },
+            {
+              "FileID": 9117,
+              "FileName": "INPADOC_coverage_202610.xlsx",
+              "FileSize": "846.5 kB",
+              "FileChecksum": "08EA24097A061FBCF3C80838E70D549F87884E40",
+              "FilePublicationDatetime": "2026-03-03T09:00:00+01:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3069,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/009",
+          "DeliveryPublicationDatetime": "2026-02-24T09:00:00+01:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 8915,
+              "FileName": "legstat_xml_202609.zip",
+              "FileSize": "380.3 MB",
+              "FileChecksum": "AD2AE047BEECE90B653BF9C784AF0DB2FB529CEE",
+              "FilePublicationDatetime": "2026-02-24T09:00:00+01:00"
+            },
+            {
+              "FileID": 8916,
+              "FileName": "statistics_authority_code_202609.xlsx",
+              "FileSize": "431.5 kB",
+              "FileChecksum": "5F92EC04110F259263AEA866A1D0AD7B2BC26663",
+              "FilePublicationDatetime": "2026-02-24T09:00:00+01:00"
+            },
+            {
+              "FileID": 8917,
+              "FileName": "legal_code_descriptions_202609.xlsx",
+              "FileSize": "305.2 kB",
+              "FileChecksum": "EA943693BE7BC7E726B49F6E0F21C76E87889E50",
+              "FilePublicationDatetime": "2026-02-24T09:00:00+01:00"
+            },
+            {
+              "FileID": 8918,
+              "FileName": "INPADOC_coverage_202609.xlsx",
+              "FileSize": "844.0 kB",
+              "FileChecksum": "3954A329F8BD440B936C1372FFF7B62429630D3A",
+              "FilePublicationDatetime": "2026-02-24T09:00:00+01:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3054,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/008",
+          "DeliveryPublicationDatetime": "2026-02-17T09:00:00+01:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 8890,
+              "FileName": "legstat_xml_202608.zip",
+              "FileSize": "194.4 MB",
+              "FileChecksum": "976AF903C8720DA3DF53F45877BCA7E0E0A365CB",
+              "FilePublicationDatetime": "2026-02-17T09:00:00+01:00"
+            },
+            {
+              "FileID": 8891,
+              "FileName": "statistics_authority_code_202608.xlsx",
+              "FileSize": "431.3 kB",
+              "FileChecksum": "76E1500910AC58B1676B4F9D0DF830E414245AFD",
+              "FilePublicationDatetime": "2026-02-17T09:00:00+01:00"
+            },
+            {
+              "FileID": 8892,
+              "FileName": "legal_code_descriptions_202608.xlsx",
+              "FileSize": "305.2 kB",
+              "FileChecksum": "EA943693BE7BC7E726B49F6E0F21C76E87889E50",
+              "FilePublicationDatetime": "2026-02-17T09:00:00+01:00"
+            },
+            {
+              "FileID": 8893,
+              "FileName": "INPADOC_coverage_202608.xlsx",
+              "FileSize": "843.7 kB",
+              "FileChecksum": "32E143C8AB61C9CE4520AA45C894B14947DDC04D",
+              "FilePublicationDatetime": "2026-02-17T09:00:00+01:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3042,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/007",
+          "DeliveryPublicationDatetime": "2026-02-10T09:00:00+01:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 8871,
+              "FileName": "legstat_xml_202607.zip",
+              "FileSize": "458.0 MB",
+              "FileChecksum": "CE05C1ECAF076497DB0AB5A3EA9ED85F6AFAB845",
+              "FilePublicationDatetime": "2026-02-10T09:00:00+01:00"
+            },
+            {
+              "FileID": 8872,
+              "FileName": "statistics_authority_code_202607.xlsx",
+              "FileSize": "431.2 kB",
+              "FileChecksum": "4B17A27251CA5FE9A64772F6C56280687AB0CC32",
+              "FilePublicationDatetime": "2026-02-10T09:00:00+01:00"
+            },
+            {
+              "FileID": 8873,
+              "FileName": "legal_code_descriptions_202607.xlsx",
+              "FileSize": "305.2 kB",
+              "FileChecksum": "EA943693BE7BC7E726B49F6E0F21C76E87889E50",
+              "FilePublicationDatetime": "2026-02-10T09:00:00+01:00"
+            },
+            {
+              "FileID": 8874,
+              "FileName": "INPADOC_coverage_202607.xlsx",
+              "FileSize": "843.7 kB",
+              "FileChecksum": "45F224D3DAF49A18E898D7B99143FB6037E49318",
+              "FilePublicationDatetime": "2026-02-10T09:00:00+01:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3029,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/006",
+          "DeliveryPublicationDatetime": "2026-02-03T09:00:00+01:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 8844,
+              "FileName": "legstat_xml_202606.zip",
+              "FileSize": "763.0 MB",
+              "FileChecksum": "B892740473FDDE389DC8EF456442AC0BFF30CD8C",
+              "FilePublicationDatetime": "2026-02-03T09:00:00+01:00"
+            },
+            {
+              "FileID": 8845,
+              "FileName": "statistics_authority_code_202606.xlsx",
+              "FileSize": "431.2 kB",
+              "FileChecksum": "8E4BFCFB38DBB0BA156DB1635B478E0E3F4442ED",
+              "FilePublicationDatetime": "2026-02-03T09:00:00+01:00"
+            },
+            {
+              "FileID": 8846,
+              "FileName": "legal_code_descriptions_202606.xlsx",
+              "FileSize": "305.2 kB",
+              "FileChecksum": "EA943693BE7BC7E726B49F6E0F21C76E87889E50",
+              "FilePublicationDatetime": "2026-02-03T09:00:00+01:00"
+            },
+            {
+              "FileID": 8847,
+              "FileName": "INPADOC_coverage_202606.xlsx",
+              "FileSize": "843.5 kB",
+              "FileChecksum": "DE65912A32E37311982E7E1F59E61B967E4672B4",
+              "FilePublicationDatetime": "2026-02-03T09:00:00+01:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3017,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/005",
+          "DeliveryPublicationDatetime": "2026-01-27T09:00:00+01:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 8819,
+              "FileName": "legstat_xml_202605.zip",
+              "FileSize": "726.7 MB",
+              "FileChecksum": "31C7BEA188CF475A64B236B5CB2443E6BD031AB5",
+              "FilePublicationDatetime": "2026-01-27T09:00:00+01:00"
+            },
+            {
+              "FileID": 8820,
+              "FileName": "statistics_authority_code_202605.xlsx",
+              "FileSize": "431.1 kB",
+              "FileChecksum": "30CA0B4E3C3D3A9618809BFD6D0A861FCD569CB6",
+              "FilePublicationDatetime": "2026-01-27T09:00:00+01:00"
+            },
+            {
+              "FileID": 8821,
+              "FileName": "legal_code_descriptions_202605.xlsx",
+              "FileSize": "305.2 kB",
+              "FileChecksum": "EA943693BE7BC7E726B49F6E0F21C76E87889E50",
+              "FilePublicationDatetime": "2026-01-27T09:00:00+01:00"
+            },
+            {
+              "FileID": 8822,
+              "FileName": "INPADOC_coverage_202605.xlsx",
+              "FileSize": "843.4 kB",
+              "FileChecksum": "FABE2A1CE6239D9BF578AA98309F832A0C721CE3",
+              "FilePublicationDatetime": "2026-01-27T09:00:00+01:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 3004,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/004",
+          "DeliveryPublicationDatetime": "2026-01-20T09:00:00+01:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 8793,
+              "FileName": "legstat_xml_202604.zip",
+              "FileSize": "1.1 GB",
+              "FileChecksum": "B69AC8A39BB42C0BCCA68F5F3390188CDBBDABDC",
+              "FilePublicationDatetime": "2026-01-20T09:00:00+01:00"
+            },
+            {
+              "FileID": 8794,
+              "FileName": "statistics_authority_code_202604.xlsx",
+              "FileSize": "431.0 kB",
+              "FileChecksum": "3AC0024C6487ED1C821F2174B9A004D9751B8466",
+              "FilePublicationDatetime": "2026-01-20T09:00:00+01:00"
+            },
+            {
+              "FileID": 8795,
+              "FileName": "legal_code_descriptions_202604.xlsx",
+              "FileSize": "305.2 kB",
+              "FileChecksum": "EA943693BE7BC7E726B49F6E0F21C76E87889E50",
+              "FilePublicationDatetime": "2026-01-20T09:00:00+01:00"
+            },
+            {
+              "FileID": 8796,
+              "FileName": "INPADOC_coverage_202604.xlsx",
+              "FileSize": "843.4 kB",
+              "FileChecksum": "1C1D1D5ED962F8D475C435B9D0CFBC8F1CCAFB10",
+              "FilePublicationDatetime": "2026-01-20T09:00:00+01:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 2992,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/003",
+          "DeliveryPublicationDatetime": "2026-01-13T09:00:00+01:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 8763,
+              "FileName": "legstat_xml_202603.zip",
+              "FileSize": "971.1 MB",
+              "FileChecksum": "76070D176D9C97ED92381C8F67BD6103B995D028",
+              "FilePublicationDatetime": "2026-01-13T09:00:00+01:00"
+            },
+            {
+              "FileID": 8764,
+              "FileName": "statistics_authority_code_202603.xlsx",
+              "FileSize": "431.0 kB",
+              "FileChecksum": "7284B0A5A0DAD5AF01D8676C6F8C77D6DF4146FF",
+              "FilePublicationDatetime": "2026-01-13T09:00:00+01:00"
+            },
+            {
+              "FileID": 8765,
+              "FileName": "legal_code_descriptions_202603.xlsx",
+              "FileSize": "305.2 kB",
+              "FileChecksum": "EA943693BE7BC7E726B49F6E0F21C76E87889E50",
+              "FilePublicationDatetime": "2026-01-13T09:00:00+01:00"
+            },
+            {
+              "FileID": 8766,
+              "FileName": "INPADOC_coverage_202603.xlsx",
+              "FileSize": "843.4 kB",
+              "FileChecksum": "8B3479FC763CFDAE31CFA775FBEE7239169008BE",
+              "FilePublicationDatetime": "2026-01-13T09:00:00+01:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 2980,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/002",
+          "DeliveryPublicationDatetime": "2026-01-06T09:00:00+01:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 8741,
+              "FileName": "legstat_xml_202602.zip",
+              "FileSize": "91.9 MB",
+              "FileChecksum": "1FF66C078B469ECCEFCEA467436BF9F124BB2299",
+              "FilePublicationDatetime": "2026-01-06T09:00:00+01:00"
+            },
+            {
+              "FileID": 8742,
+              "FileName": "statistics_authority_code_202602.xlsx",
+              "FileSize": "430.9 kB",
+              "FileChecksum": "57074A87F5DB83A16F7B070A83CEF56C7DD20566",
+              "FilePublicationDatetime": "2026-01-06T09:00:00+01:00"
+            },
+            {
+              "FileID": 8743,
+              "FileName": "legal_code_descriptions_202602.xlsx",
+              "FileSize": "305.2 kB",
+              "FileChecksum": "0DA010AABBCC36F9AAF45F782DA196F2DCB1CE70",
+              "FilePublicationDatetime": "2026-01-06T09:00:00+01:00"
+            },
+            {
+              "FileID": 8744,
+              "FileName": "INPADOC_coverage_202602.xlsx",
+              "FileSize": "843.3 kB",
+              "FileChecksum": "F2D7FA85CB9268AE54BA5EB1604EBC9EA2B4B40C",
+              "FilePublicationDatetime": "2026-01-06T09:00:00+01:00"
+            }
+          ]
+        },
+        {
+          "DeliveryID": 2966,
+          "DeliveryName": "14.11 INPADOC - EPO worldwide legal event data 2026/001",
+          "DeliveryPublicationDatetime": "2025-12-30T09:00:00+01:00",
+          "DeliveryExpiryDatetime": null,
+          "Files": [
+            {
+              "FileID": 8717,
+              "FileName": "legstat_xml_202601.zip",
+              "FileSize": "293.7 MB",
+              "FileChecksum": "43EF579E48D5D5EA752FA49BE03A76069E41D028",
+              "FilePublicationDatetime": "2025-12-30T09:00:00+01:00"
+            },
+            {
+              "FileID": 8718,
+              "FileName": "statistics_authority_code_202601.xlsx",
+              "FileSize": "430.7 kB",
+              "FileChecksum": "B077F1CDB46175A8577CA47DC816EDC84CD7FC70",
+              "FilePublicationDatetime": "2025-12-30T09:00:00+01:00"
+            },
+            {
+              "FileID": 8719,
+              "FileName": "legal_code_descriptions_202601.xlsx",
+              "FileSize": "305.2 kB",
+              "FileChecksum": "0DA010AABBCC36F9AAF45F782DA196F2DCB1CE70",
+              "FilePublicationDatetime": "2025-12-30T09:00:00+01:00"
+            },
+            {
+              "FileID": 8720,
+              "FileName": "INPADOC_coverage_202601.xlsx",
+              "FileSize": "842.9 kB",
+              "FileChecksum": "BC438641827627BF41BADA5BECAB40F57BCC22B6",
+              "FilePublicationDatetime": "2025-12-30T09:00:00+01:00"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

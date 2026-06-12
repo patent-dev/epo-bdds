@@ -1,4 +1,4 @@
-.PHONY: generate test test-integration lint fmt coverage tidy examples
+.PHONY: generate test test-integration check-integration lint fmt coverage tidy examples refresh-fixtures
 
 # generate re-applies the OpenAPI fixes (if a script is present) and regenerates
 # the typed client via the //go:generate directives.
@@ -12,6 +12,11 @@ test:
 
 test-integration:
 	go test -race -count=1 -tags=integration ./...
+
+# check-integration verifies every exported Client endpoint method has a
+# per-endpoint TestIntegration<Method> in a //go:build integration test file.
+check-integration:
+	./scripts/check-integration-coverage.sh
 
 lint:
 	golangci-lint run
@@ -32,3 +37,15 @@ tidy:
 # The "examples" arg is required: the demo only records when os.Args[1] == "examples".
 examples:
 	cd demo && go run . examples
+
+# refresh-fixtures deliberately rebuilds the committed golden set in
+# testdata/examples from the live demo/examples recordings. Run it (after
+# `make examples`) ONLY when a human intends to update the goldens to a newer
+# real response.
+#
+# The deterministic tests (TestFixtures in decode_examples_test.go) read the
+# COMMITTED testdata/examples copies, never demo/examples, so re-running the demo
+# does not change test behaviour until the goldens are refreshed here and the diff
+# is reviewed and committed.
+refresh-fixtures:
+	./scripts/refresh-fixtures.sh
