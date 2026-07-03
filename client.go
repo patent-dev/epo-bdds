@@ -18,6 +18,12 @@ import (
 	"github.com/patent-dev/epo-bdds/generated"
 )
 
+// Version is the library version. It surfaces through the default User-Agent.
+const Version = "0.2.2"
+
+// DefaultUserAgent identifies this library in outbound requests.
+const DefaultUserAgent = "epo-bdds-go/" + Version + " (patent.dev; +https://github.com/patent-dev/epo-bdds)"
+
 const (
 	// Default OAuth2 token TTL, used when the token response omits expires_in.
 	defaultTokenTTL = time.Hour
@@ -51,7 +57,7 @@ type Config struct {
 func DefaultConfig() *Config {
 	return &Config{
 		BaseURL:    "https://publication-bdds.apps.epo.org",
-		UserAgent:  "PatentDev/BDDS/1.0",
+		UserAgent:  DefaultUserAgent,
 		MaxRetries: 3,
 		RetryDelay: time.Second,
 		Timeout:    30 * time.Second,
