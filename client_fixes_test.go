@@ -1,11 +1,14 @@
 package bdds
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"testing"
@@ -349,5 +352,157 @@ func TestGetLatestDeliverySkipsNotifications(t *testing.T) {
 	}
 	if delivery.DeliveryID != 1 {
 		t.Errorf("expected data delivery 1 (not the newer notification), got %d", delivery.DeliveryID)
+	}
+}
+
+// newPartialDownloadServer returns an API server whose first failCount download
+// responses announce the full Content-Length but drop the connection after
+// sending only the first partial bytes, then serve the complete content.
+func newPartialDownloadServer(t *testing.T, content []byte, partial, failCount int) (*httptest.Server, *int32) {
+	t.Helper()
+	var apiCalls int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		if int(atomic.AddInt32(&apiCalls, 1)) <= failCount {
+			hj, ok := w.(http.Hijacker)
+			if !ok {
+				t.Error("response writer does not support hijacking")
+				return
+			}
+			conn, buf, err := hj.Hijack()
+			if err != nil {
+				t.Errorf("hijack: %v", err)
+				return
+			}
+			// Announce the full length, write a partial body, then close so
+			// the client sees an unexpected EOF mid-copy.
+			_, _ = buf.WriteString("HTTP/1.1 200 OK\r\nContent-Length: " + strconv.Itoa(len(content)) + "\r\n\r\n")
+			_, _ = buf.Write(content[:partial])
+			_ = buf.Flush()
+			_ = conn.Close()
+			return
+		}
+		_, _ = w.Write(content)
+	}))
+	return srv, &apiCalls
+}
+
+// TestDownloadRetryByteExact verifies that a download retried after a partial
+// write rewinds a seekable destination, producing byte-exact output.
+func TestDownloadRetryByteExact(t *testing.T) {
+	authServer, _ := newAuthServer(3600)
+	defer authServer.Close()
+
+	content := []byte("full delivery file content that must arrive byte-exact after a retry")
+	apiServer, apiCalls := newPartialDownloadServer(t, content, 10, 1)
+	defer apiServer.Close()
+
+	client := newTestClient(t, apiServer.URL, authServer.URL)
+
+	tmp, err := os.CreateTemp(t.TempDir(), "bdds-download-*.zip")
+	if err != nil {
+		t.Fatalf("CreateTemp: %v", err)
+	}
+	defer func() { _ = tmp.Close() }()
+
+	if err := client.DownloadFile(context.Background(), 1, 2, 3, tmp); err != nil {
+		t.Fatalf("DownloadFile after partial-write retry: %v", err)
+	}
+	got, err := os.ReadFile(tmp.Name())
+	if err != nil {
+		t.Fatalf("ReadFile: %v", err)
+	}
+	if !bytes.Equal(got, content) {
+		t.Errorf("downloaded content corrupted by retry:\n got %q\nwant %q", got, content)
+	}
+	if c := atomic.LoadInt32(apiCalls); c != 2 {
+		t.Errorf("expected 2 download attempts (partial + success), got %d", c)
+	}
+}
+
+// nonSeekableWriter hides any Seek method, standing in for a destination (e.g.
+// a network stream) that cannot be rewound between retries.
+type nonSeekableWriter struct{ buf bytes.Buffer }
+
+func (w *nonSeekableWriter) Write(p []byte) (int, error) { return w.buf.Write(p) }
+
+// TestDownloadPartialWriteNonSeekableFailsFast verifies that a partial write to
+// a non-seekable destination fails immediately instead of retrying and
+// appending corrupted output.
+func TestDownloadPartialWriteNonSeekableFailsFast(t *testing.T) {
+	authServer, _ := newAuthServer(3600)
+	defer authServer.Close()
+
+	content := []byte("full delivery file content that never completes")
+	apiServer, apiCalls := newPartialDownloadServer(t, content, 10, 100)
+	defer apiServer.Close()
+
+	client := newTestClient(t, apiServer.URL, authServer.URL)
+
+	dst := &nonSeekableWriter{}
+	err := client.DownloadFile(context.Background(), 1, 2, 3, dst)
+	if err == nil {
+		t.Fatal("expected error for interrupted download to non-seekable destination")
+	}
+	if c := atomic.LoadInt32(apiCalls); c != 1 {
+		t.Errorf("expected exactly 1 download attempt (no retry after partial write), got %d", c)
+	}
+	if dst.buf.Len() != 10 {
+		t.Errorf("expected only the 10 partial bytes in destination, got %d", dst.buf.Len())
+	}
+}
+
+// TestAlways401SingleReauth verifies a persistent 401 triggers exactly one
+// re-authentication before surfacing the typed auth error.
+func TestAlways401SingleReauth(t *testing.T) {
+	authServer, authCalls := newAuthServer(3600)
+	defer authServer.Close()
+
+	var apiCalls int32
+	apiServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		atomic.AddInt32(&apiCalls, 1)
+		w.WriteHeader(http.StatusUnauthorized)
+		_, _ = w.Write([]byte(`{"error":"invalid subscription"}`))
+	}))
+	defer apiServer.Close()
+
+	client := newTestClient(t, apiServer.URL, authServer.URL)
+
+	_, err := client.ListProducts(context.Background())
+	if err == nil {
+		t.Fatal("expected error for persistent 401")
+	}
+	var ae *AuthError
+	if !errors.As(err, &ae) {
+		t.Fatalf("expected *AuthError, got %T: %v", err, err)
+	}
+	if ae.StatusCode != http.StatusUnauthorized {
+		t.Errorf("expected status 401, got %d", ae.StatusCode)
+	}
+	if c := atomic.LoadInt32(&apiCalls); c != 2 {
+		t.Errorf("expected exactly 2 API calls (initial + single re-auth retry), got %d", c)
+	}
+	if c := atomic.LoadInt32(authCalls); c != 2 {
+		t.Errorf("expected exactly 2 auth calls (initial + single re-auth), got %d", c)
+	}
+}
+
+// TestNonRetryableErrorStopsRetry verifies the nonRetryableError sentinel is
+// never retried and keeps the wrapped error reachable via errors.Is.
+func TestNonRetryableErrorStopsRetry(t *testing.T) {
+	client := &Client{config: DefaultConfig()}
+	inner := errors.New("permanent failure")
+	wrapped := &nonRetryableError{err: inner}
+
+	if retry, _ := client.classifyRetry(wrapped); retry {
+		t.Error("expected nonRetryableError to be classified as not retryable")
+	}
+	if !errors.Is(wrapped, inner) {
+		t.Error("expected wrapped error to be reachable via errors.Is")
+	}
+
+	// A plain unexpected error stays retryable, so the sentinel is what stops
+	// the loop, not a broader behavior change.
+	if retry, _ := client.classifyRetry(inner); !retry {
+		t.Error("expected plain error to remain retryable")
 	}
 }

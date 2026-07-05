@@ -223,6 +223,7 @@ func (c *Client) authenticateLocked(ctx context.Context) error {
 // backoff wait honours context cancellation.
 func (c *Client) retryableRequest(ctx context.Context, fn func() error) error {
 	var lastErr error
+	reauthed := false
 	for attempt := 0; attempt <= c.config.MaxRetries; attempt++ {
 		err := fn()
 		if err == nil {
@@ -235,9 +236,15 @@ func (c *Client) retryableRequest(ctx context.Context, fn func() error) error {
 			break
 		}
 
-		// On 401, force re-auth by clearing the cached token.
+		// On 401, force re-auth by clearing the cached token. Re-auth happens
+		// at most once per call: a second 401 with a fresh token means the
+		// credentials or subscription are rejected, which is permanent.
 		var authErr *AuthError
 		if errors.As(err, &authErr) && authErr.StatusCode == http.StatusUnauthorized {
+			if reauthed {
+				break
+			}
+			reauthed = true
 			c.clearToken()
 		}
 
@@ -260,6 +267,11 @@ func (c *Client) retryableRequest(ctx context.Context, fn func() error) error {
 // classifyRetry reports whether err is transient and should be retried, plus an
 // optional minimum wait (e.g. a Retry-After hint from a rate-limit response).
 func (c *Client) classifyRetry(err error) (retry bool, after time.Duration) {
+	var permanent *nonRetryableError
+	if errors.As(err, &permanent) {
+		return false, 0
+	}
+
 	var authErr *AuthError
 	if errors.As(err, &authErr) {
 		return authErr.StatusCode == http.StatusUnauthorized, 0
@@ -409,8 +421,13 @@ func (c *Client) DownloadFile(ctx context.Context, productID, deliveryID, fileID
 	return c.DownloadFileWithProgress(ctx, productID, deliveryID, fileID, dst, nil)
 }
 
-// DownloadFileWithProgress downloads a file to the provided writer with progress callback
+// DownloadFileWithProgress downloads a file to the provided writer with progress callback.
+// If an attempt fails after partially writing to dst, the retry rewinds a seekable
+// destination (truncating it when supported, as *os.File is) before copying again,
+// so the output is always byte-exact or the call errors - never silently corrupted.
+// A non-seekable destination with partial data fails fast instead of retrying.
 func (c *Client) DownloadFileWithProgress(ctx context.Context, productID, deliveryID, fileID int, dst io.Writer, progressFn func(bytesWritten, totalBytes int64)) error {
+	counting := &countingWriter{w: dst}
 	return c.retryableRequest(ctx, func() error {
 		resp, err := c.generatedClient.DownloadFile(ctx, productID, deliveryID, fileID)
 		if err != nil {
@@ -430,6 +447,15 @@ func (c *Client) DownloadFileWithProgress(ctx context.Context, productID, delive
 			return statusToError(resp.StatusCode, resp.Header, body)
 		}
 
+		// A previous attempt already wrote bytes; rewind the destination so
+		// the restarted copy cannot append to partial output.
+		if counting.n > 0 {
+			if err := restartDownloadDestination(dst); err != nil {
+				return &nonRetryableError{err: err}
+			}
+			counting.n = 0
+		}
+
 		// If progress callback provided, wrap reader
 		var reader io.Reader = resp.Body
 		if progressFn != nil {
@@ -440,9 +466,37 @@ func (c *Client) DownloadFileWithProgress(ctx context.Context, productID, delive
 			}
 		}
 
-		_, err = io.Copy(dst, reader)
-		return err
+		if _, err := io.Copy(counting, reader); err != nil {
+			// Partial output in a destination that cannot be rewound would be
+			// corrupted by a retry, so fail fast instead.
+			if counting.n > 0 {
+				if _, ok := dst.(io.Seeker); !ok {
+					return &nonRetryableError{err: fmt.Errorf("download interrupted after %d bytes written to non-seekable destination, cannot retry safely: %w", counting.n, err)}
+				}
+			}
+			return err
+		}
+		return nil
 	})
+}
+
+// restartDownloadDestination rewinds a partially written download destination
+// so a retried copy starts from the beginning. The writer must be seekable; if
+// it also supports truncation (as *os.File does), the partial content is removed.
+func restartDownloadDestination(dst io.Writer) error {
+	seeker, ok := dst.(io.Seeker)
+	if !ok {
+		return fmt.Errorf("cannot retry download: destination is not seekable and already contains partial data")
+	}
+	if _, err := seeker.Seek(0, io.SeekStart); err != nil {
+		return fmt.Errorf("failed to rewind destination for download retry: %w", err)
+	}
+	if truncator, ok := dst.(interface{ Truncate(int64) error }); ok {
+		if err := truncator.Truncate(0); err != nil {
+			return fmt.Errorf("failed to truncate destination for download retry: %w", err)
+		}
+	}
+	return nil
 }
 
 // GetProductByName finds a product by name

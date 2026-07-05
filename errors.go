@@ -42,3 +42,18 @@ type statusError struct {
 func (e *statusError) Error() string {
 	return fmt.Sprintf("unexpected status %d: %s", e.StatusCode, e.Body)
 }
+
+// nonRetryableError marks a permanent failure so the retry loop stops
+// immediately instead of exhausting attempts. It wraps the underlying error,
+// which stays reachable via errors.Is/As.
+type nonRetryableError struct {
+	err error
+}
+
+func (e *nonRetryableError) Error() string {
+	return e.err.Error()
+}
+
+func (e *nonRetryableError) Unwrap() error {
+	return e.err
+}
