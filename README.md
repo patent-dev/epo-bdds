@@ -153,10 +153,10 @@ err = client.DownloadFileWithProgress(ctx, 3, 12345, 67890, f,
 | ID | Name | Description |
 |----|------|-------------|
 | 3  | EP DocDB front file | Bibliographic data (front file) |
-| 4  | EP full-text data - front file | Full-text patent data |
 | 14 | EP DocDB back file | Bibliographic data (back file) |
 | 17 | PATSTAT Global | Patent statistics database |
 | 18 | PATSTAT EP Register | EP register data |
+| 32 | EP full-text data | Full-text patent data |
 
 ### Demo
 
